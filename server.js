@@ -2,6 +2,8 @@
 const express=require('express');
 const expresslayout=require('express-ejs-layouts');
 const indexrouter=require('./routes/index');
+const authorrouter=require('./routes/authors');
+const bodyparser=require('body-parser');
 const mongoose=require('mongoose');
 const app=express();
 require('dotenv').config();
@@ -26,7 +28,9 @@ app.set('views',__dirname+'/views');
 app.set('layout','layouts/layout');
 app.use(expresslayout);
 app.use(express.static('public'));
+app.use(bodyparser.urlencoded({limit:'10mb',extended:false}));
 
 
 app.use('/',indexrouter); 
+app.use('/authors',authorrouter);
 app.listen(process.env.PORT||3000);
