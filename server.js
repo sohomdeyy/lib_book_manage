@@ -3,9 +3,13 @@ const express=require('express');
 const expresslayout=require('express-ejs-layouts');
 const indexrouter=require('./routes/index');
 const authorrouter=require('./routes/authors');
+const bookrouter=require('./routes/books');
 const bodyparser=require('body-parser');
 const mongoose=require('mongoose');
-const app=express();
+///const fileupload = require("express-fileupload");
+
+const app=express(); 
+//app.use(fileupload());
 require('dotenv').config();
 
 mongoose.connect(process.env.DB,{
@@ -33,4 +37,5 @@ app.use(bodyparser.urlencoded({limit:'10mb',extended:false}));
 
 app.use('/',indexrouter); 
 app.use('/authors',authorrouter);
+app.use('/books',bookrouter);
 app.listen(process.env.PORT||3000);
