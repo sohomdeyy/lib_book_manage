@@ -6,7 +6,7 @@ const Book=require('../models/book');
 const Author=require('../models/author');
 const multer = require('multer');
 const uploadPath=path.join('public',Book.coverimageBAsePath);
-const imageMimeTypes=['image/jpeg','image/png']
+const imageMimeTypes=['image/jpeg','image/png','image/jpg']
 const upload=multer({
     dest:uploadPath,
     fileFilter:(req,file,callback)=>{
@@ -19,7 +19,27 @@ const upload=multer({
 
 //all book
 router.get('/',async (req,res)=>{
-    res.send('All book');
+    let query=Book.find();
+    if(req.query.title!=null && req.query.title!=''){
+        query=query.regex('title',new RegExp(req.query.title,'i'))
+    }
+    if(req.query.publishbefore!=null && req.query.publishbefore!=''){
+        query=query.lte('publishdate',req.query.publishbefore);
+    }
+    if(req.query.publishafter!=null && req.query.publishafter!=''){
+        query=query.gte('publishdate',req.query.publishafter);    //publishdate greater than equal publishafter date
+    }
+    
+    try{
+        const books=await query.exec();
+       res.render('books/index',{
+        books:books,
+        searchoption:req.query
+    }) 
+    }catch{
+        res.redirect('/');
+    }
+    
 });
 
 
