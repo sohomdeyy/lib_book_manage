@@ -6,6 +6,7 @@ const authorrouter=require('./routes/authors');
 const bookrouter=require('./routes/books');
 const bodyparser=require('body-parser');
 const mongoose=require('mongoose');
+const methodoverride=require('method-override');
 ///const fileupload = require("express-fileupload");
 
 const app=express(); 
@@ -33,6 +34,7 @@ app.set('layout','layouts/layout');
 app.use(expresslayout);
 app.use(express.static('public'));
 app.use(bodyparser.urlencoded({limit:'10mb',extended:false}));
+app.use(methodoverride('_method'));
 
 
 app.use('/',indexrouter); 
