@@ -65,6 +65,57 @@ router.post('/',async (req,res)=>{
     }
 });
 
+router.get('/:id',async(req,res)=>{
+    try {
+        const book=await Book.findById(req.params.id).populate('author').exec()
+        res.render('books/show',{book:book})
+    } catch (e) {
+        console.log(e);
+        res.redirect('/');
+    }
+})
+
+//new book route
+router.get('/:id/edit',async (req,res)=>{  
+    try {
+        const book=await Book.findById(req.params.id);
+        renderEditPage(res,book)
+    } catch (error) {
+        console.log(error);
+        res.redirect('/');
+    }
+    
+    });
+
+    router.put('/:id',async(req,res)=>{
+        let book
+        try{
+            book=await Book.findById(req.params.id)
+            book.title=req.body.title;
+            book.description=req.body.title;
+            book.publishdate=req.body.publishdate;
+            book.pagecount=req.body.pagecount;
+            // book.creatat=req.body.creatat;
+            // book.coverimage=req.body.coverimage;
+             book.author=req.body.author;
+             saveCover(book,req.body.cover);
+            await book.save();
+             res.redirect(`/books/${book.id}`);
+               
+        }catch(e){
+            console.log(e);
+            if(book==null){
+                res.redirect('/');
+            }
+            else{
+            res.render('books/edit',{
+                author: book,
+                errorMessage:'Error updating book'
+            })
+        }
+        }
+    })
+
 async function renderNewPage(res,book,hasError=false) {
    try{
         const authors=await Author.find({});
@@ -80,6 +131,22 @@ async function renderNewPage(res,book,hasError=false) {
        res.redirect('/books')
     }
 }
+
+async function renderEditPage(res,book,hasError=false) {
+    try{
+         const authors=await Author.find({});
+         const params={
+             authors:authors,
+             book:book
+        }
+        if (hasError) params.errorMessage='error editing book';
+        res.render('books/edit',params)
+       }
+    catch{
+        
+        res.redirect('/books')
+     }
+ }
 
 function saveCover(book, coverEncoded) {
     if(coverEncoded==null){
